@@ -29,23 +29,26 @@ ext {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	// Spring Boot 기본 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.modulith:spring-modulith-starter-core'
-	implementation 'org.springframework.session:spring-session-data-mongodb'
-	implementation 'org.springframework.session:spring-session-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
-	runtimeOnly 'org.postgresql:postgresql'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
+	
+	// 개발 도구
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	
+	// 데이터베이스 (개발용 H2, 운영용 MySQL 등 선택 가능)
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	
+	// 테스트
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
