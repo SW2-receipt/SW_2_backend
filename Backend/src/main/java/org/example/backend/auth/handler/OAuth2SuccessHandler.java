@@ -44,15 +44,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         
         log.info("OAuth2 login success - User: {}", oAuth2User.getAttributes().get("id"));
+        log.info("Redirecting to frontend: {}", redirectUri);
         
-        // TODO: Generate JWT token and set in cookie/header if needed
-        // Example: String jwtToken = jwtTokenProvider.generateToken(oAuth2User);
-        //          response.addHeader("Authorization", "Bearer " + jwtToken);
-        
-        // Redirect to frontend
-        // In production, can pass token as query parameter or fragment
-        // Example: response.sendRedirect(redirectUri + "?token=" + jwtToken);
-        response.sendRedirect(redirectUri);
+        // 프론트엔드로 리다이렉트 (성공 파라미터 포함)
+        // 프론트엔드에서 이 파라미터를 확인하여 로그인 상태로 전환
+        String redirectUrl = redirectUri + "?login=success";
+        log.info("Final redirect URL: {}", redirectUrl);
+        response.sendRedirect(redirectUrl);
     }
 }
 

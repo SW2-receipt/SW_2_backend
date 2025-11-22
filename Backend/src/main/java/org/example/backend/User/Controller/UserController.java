@@ -36,7 +36,16 @@ public class UserController {
         }
 
         // Extract provider and oauthId from OAuth2User
-        String oauthId = String.valueOf(oAuth2User.getAttribute("id"));
+        // 카카오는 id를 Long 타입으로 반환하므로 안전하게 변환
+        Object idAttribute = oAuth2User.getAttribute("id");
+        String oauthId;
+        if (idAttribute instanceof Long) {
+            oauthId = String.valueOf((Long) idAttribute);
+        } else if (idAttribute instanceof String) {
+            oauthId = (String) idAttribute;
+        } else {
+            oauthId = String.valueOf(idAttribute);
+        }
         String provider = extractProvider(oAuth2User);
 
         // Retrieve user information from database

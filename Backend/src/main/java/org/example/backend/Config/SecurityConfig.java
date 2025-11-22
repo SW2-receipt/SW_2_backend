@@ -9,6 +9,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Spring Security Configuration
@@ -25,6 +31,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // CORS 설정
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                
                 // Disable CSRF for REST API
                 .csrf(csrf -> csrf.disable())
                 
@@ -66,6 +75,40 @@ public class SecurityConfig {
         http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 
         return http.build();
+    }
+
+    /**
+     * CORS 설정
+     * 프론트엔드(localhost:8081)에서 백엔드로의 요청을 허용
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        
+        // 허용할 Origin 설정
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:8081",
+                "http://localhost:3000",
+                "http://127.0.0.1:8081",
+                "http://127.0.0.1:3000"
+        ));
+        
+        // 허용할 HTTP 메서드
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        
+        // 허용할 헤더
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        
+        // 인증 정보 포함 허용 (쿠키, 인증 헤더 등)
+        configuration.setAllowCredentials(true);
+        
+        // Preflight 요청 캐시 시간 (초)
+        configuration.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        
+        return source;
     }
 }
 
