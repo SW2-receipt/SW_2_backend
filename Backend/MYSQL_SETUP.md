@@ -70,3 +70,6 @@ After starting the application, check the logs to ensure MySQL connection is suc
 - Check user has CREATE TABLE permissions
 - Verify `spring.jpa.hibernate.ddl-auto=update` is set
 
+
+
+

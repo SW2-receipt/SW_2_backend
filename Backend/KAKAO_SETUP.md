@@ -57,3 +57,6 @@ GET http://localhost:8080/api/users/me
 - **리다이렉트 안 됨**: 카카오 개발자 콘솔의 Redirect URI 확인
 - **사용자 정보 null**: 카카오 개발자 콘솔의 동의항목 설정 확인
 
+
+
+

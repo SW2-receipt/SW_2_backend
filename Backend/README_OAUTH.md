@@ -157,3 +157,6 @@ src/main/java/org/example/backend/
 - 세션 무효화
 - 카카오 로그아웃 API 호출 (선택사항)
 
+
+
+

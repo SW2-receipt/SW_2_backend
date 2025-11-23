@@ -3,6 +3,7 @@ package org.example.backend.auth.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.backend.auth.dto.KakaoUserInfo;
+import org.example.backend.auth.dto.NaverUserInfo;
 import org.example.backend.auth.dto.OAuth2UserInfo;
 import org.example.backend.User.Domain.Role;
 import org.example.backend.User.Domain.User;
@@ -58,18 +59,22 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         // Retrieve or register user in database
         User user = saveOrUpdateUser(userInfo, registrationId);
 
-        // Add provider information to attributes (for UserController)
+        // Add provider information to attributes (for OAuth2SuccessHandler)
         Map<String, Object> modifiedAttributes = new HashMap<>(attributes);
         modifiedAttributes.put("provider", registrationId);
         modifiedAttributes.put("userId", user.getId());
+        modifiedAttributes.put("email", userInfo.getEmail());
 
         // Return in format usable by Spring Security
         // nameAttributeKey: key used to get user identifier from OAuth2User
-        // For Kakao, use "id" field
+        // For Kakao, use "id" field (top level)
+        // For Naver, use "response" field (which contains the user info map)
+        // Spring Security will use the provider's user-name-attribute setting
+        String nameAttributeKey = "kakao".equals(registrationId) ? "id" : "response";
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
                 modifiedAttributes,
-                "id" // Field name for user ID in Kakao API response
+                nameAttributeKey
         );
     }
 
@@ -82,6 +87,8 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
     private OAuth2UserInfo getOAuth2UserInfo(String registrationId, Map<String, Object> attributes) {
         if ("kakao".equals(registrationId)) {
             return new KakaoUserInfo(attributes);
+        } else if ("naver".equals(registrationId)) {
+            return new NaverUserInfo(attributes);
         } else {
             throw new OAuth2AuthenticationException("Unsupported OAuth2 provider: " + registrationId);
         }

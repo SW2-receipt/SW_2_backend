@@ -88,3 +88,6 @@ To add a new OAuth2 provider (e.g., Naver):
 - `OAuth2UserInfo.java` - **Required** (abstract class for user info)
 - `KakaoUserInfo.java` - **Required** (Kakao user info parser)
 
+
+
+

@@ -82,3 +82,6 @@ public class KakaoUserInfo extends OAuth2UserInfo {
     }
 }
 
+
+
+

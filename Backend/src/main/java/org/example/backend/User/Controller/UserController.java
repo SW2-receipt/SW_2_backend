@@ -26,31 +26,49 @@ public class UserController {
 
     /**
      * Get current logged-in user information
-     * @param oAuth2User Current logged-in OAuth2 user
+     * Supports both JWT authentication (User object) and OAuth2 session authentication (OAuth2User)
+     * @param user Current logged-in user (from JWT authentication)
+     * @param oAuth2User Current logged-in OAuth2 user (from OAuth2 session authentication)
      * @return User information
      */
     @GetMapping("/me")
-    public UserResponseDto getCurrentUser(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        if (oAuth2User == null) {
-            throw new IllegalStateException("User is not logged in");
+    public UserResponseDto getCurrentUser(
+            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal OAuth2User oAuth2User) {
+        
+        // Try JWT authentication first (User object)
+        if (user != null) {
+            return UserResponseDto.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .name(user.getName())
+                    .role(user.getRole().name())
+                    .provider(user.getProvider())
+                    .createdAt(user.getCreatedAt())
+                    .build();
         }
+        
+        // Fallback to OAuth2 session authentication (OAuth2User)
+        if (oAuth2User != null) {
+            // Extract provider and oauthId from OAuth2User
+            String oauthId = String.valueOf(oAuth2User.getAttribute("id"));
+            String provider = extractProvider(oAuth2User);
 
-        // Extract provider and oauthId from OAuth2User
-        String oauthId = String.valueOf(oAuth2User.getAttribute("id"));
-        String provider = extractProvider(oAuth2User);
+            // Retrieve user information from database
+            User dbUser = userRepository.findByProviderAndOauthId(provider, oauthId)
+                    .orElseThrow(() -> new IllegalStateException("User not found"));
 
-        // Retrieve user information from database
-        User user = userRepository.findByProviderAndOauthId(provider, oauthId)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
-
-        return UserResponseDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .name(user.getName())
-                .role(user.getRole().name())
-                .provider(user.getProvider())
-                .createdAt(user.getCreatedAt())
-                .build();
+            return UserResponseDto.builder()
+                    .id(dbUser.getId())
+                    .email(dbUser.getEmail())
+                    .name(dbUser.getName())
+                    .role(dbUser.getRole().name())
+                    .provider(dbUser.getProvider())
+                    .createdAt(dbUser.getCreatedAt())
+                    .build();
+        }
+        
+        throw new IllegalStateException("User is not logged in");
     }
 
     /**
